@@ -30,6 +30,24 @@ functions:
       - http:
           path: users
           method: get
+  createUser:
+    handler: bin/createUser
+    events:
+      - http:
+          path: users
+          method: post
+  updateUser:
+    handler: bin/updateUser
+    events:
+      - http:
+          path: users
+          method: put
+  deleteUser:
+    handler: bin/deleteUser
+    events:
+      - http:
+          path: users
+          method: delete
 
 resources:
   Resources:
