@@ -3,3 +3,4 @@ build
 node_modules
 .dynamodb
 .serverless
+shared-local-instance.db
