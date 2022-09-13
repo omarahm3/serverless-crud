@@ -112,10 +112,7 @@ func getDynamoClient() (*dynamodb.DynamoDB, error) {
 	if err != nil {
 		return nil, err
 	}
-	return dynamodb.New(awsSession, &aws.Config{
-		Region:   aws.String(region),
-		Endpoint: aws.String("http://localhost:8001"),
-	}), nil
+	return dynamodb.New(awsSession), nil
 }
 
 func newHandler(req Request, tableName string, dynamoClient *dynamodb.DynamoDB) *Handler {
