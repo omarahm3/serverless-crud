@@ -1,0 +1,61 @@
+service: sls-users
+
+provider:
+  name: aws
+  runtime: go1.x
+  environment:
+    TABLE_NAME: users-${opt:stage, sls:stage}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:DescribeTable
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: "arn:aws:dynamodb:*:*:*"
+
+plugins:
+  - serverless-offline
+  - serverless-dynamodb-local
+
+custom:
+  dynamodb:
+    stages:
+      - dev
+    start:
+      port: 8001
+      inMemory: true
+      migrate: true
+
+package:
+  exclude:
+    - ./**
+  include:
+    - ./bin/**
+
+functions:
+  getUser:
+    handler: ./functions/getUser/getUser.go
+    events:
+      - http:
+          path: users
+          method: get
+
+resources:
+  Resources:
+    UsersCRUDDynamoTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: 'users-${opt:stage, sls:stage}'
+        AttributeDefinitions:
+          - AttributeName: email
+            AttributeType: S
+        KeySchema:
+          - AttributeName: email
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1

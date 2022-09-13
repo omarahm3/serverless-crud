@@ -44,13 +44,17 @@ func FetchUser(email, tableName string, dynamoClient *dynamodb.DynamoDB) (*User,
 
 	result, err := dynamoClient.GetItem(input)
 	if err != nil {
-		return nil, ErrorFailedToFetchUser
+		return nil, err
 	}
 
 	u := new(User)
 	err = dynamodbattribute.UnmarshalMap(result.Item, &u)
 	if err != nil {
 		return nil, ErrorFailedToUnmarshalUser
+	}
+
+	if u.Email == "" {
+		return nil, nil
 	}
 
 	return u, nil

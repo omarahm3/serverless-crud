@@ -18,67 +18,69 @@ type ErrorBody struct {
 	ErrorMsg *string `json:"error,omitempty"`
 }
 
-func GetUser(req Request, tableName string, dynamoClient *dynamodb.DynamoDB) (*Response, error) {
-	// TODO this should []string slice
-	emails := req.QueryStringParameters["email"]
+func GetUser(req Request, tableName string, dynamoClient *dynamodb.DynamoDB) (Response, error) {
+	email := req.QueryStringParameters["email"]
 
-	if len(emails) > 0 {
-		return getSingleUser(emails, tableName, dynamoClient)
+	if email != "" {
+		return getSingleUser(email, tableName, dynamoClient)
 	}
 
 	return getMultipleUsers(tableName, dynamoClient)
 }
 
-func CreateUser(req Request, tableName string, dynamoClient *dynamodb.DynamoDB) (*Response, error) {
+func CreateUser(req Request, tableName string, dynamoClient *dynamodb.DynamoDB) (Response, error) {
 	result, err := user.CreateUser(req, tableName, dynamoClient)
 	if err != nil {
 		return errorResponse(err)
 	}
 
-	return response(http.StatusCreated, result)
+	return JSONResponse(http.StatusCreated, result)
 }
 
-func UpdateUser(req Request, tableName string, dynamoClient *dynamodb.DynamoDB) (*Response, error) {
+func UpdateUser(req Request, tableName string, dynamoClient *dynamodb.DynamoDB) (Response, error) {
 	result, err := user.UpdateUser(req, tableName, dynamoClient)
 	if err != nil {
 		return errorResponse(err)
 	}
 
-	return response(http.StatusCreated, result)
+	return JSONResponse(http.StatusCreated, result)
 }
 
-func DeleteUser(req Request, tableName string, dynamoClient *dynamodb.DynamoDB) (*Response, error) {
+func DeleteUser(req Request, tableName string, dynamoClient *dynamodb.DynamoDB) (Response, error) {
 	err := user.DeleteUser(req, tableName, dynamoClient)
 	if err != nil {
 		return errorResponse(err)
 	}
 
-	return response(http.StatusCreated, nil)
+	return JSONResponse(http.StatusCreated, nil)
 }
 
-func UnhandledMethod() (*Response, error) {
-	return response(http.StatusMethodNotAllowed, "method is not allowed")
+func UnhandledMethod() (Response, error) {
+	return JSONResponse(http.StatusMethodNotAllowed, "method is not allowed")
 }
 
-func getSingleUser(email, tableName string, dynamoClient *dynamodb.DynamoDB) (*Response, error) {
-	// TODO FetchUser must accept string email
+func getSingleUser(email, tableName string, dynamoClient *dynamodb.DynamoDB) (Response, error) {
 	u, err := user.FetchUser(email, tableName, dynamoClient)
 	if err != nil {
-		return response(http.StatusBadRequest, ErrorBody{aws.String(err.Error())})
+		return JSONResponse(http.StatusBadRequest, ErrorBody{aws.String(err.Error())})
 	}
 
-	return response(http.StatusOK, u)
+	if u == nil {
+		return JSONResponse(http.StatusNotFound, "user was not found")
+	}
+
+	return JSONResponse(http.StatusOK, u)
 }
 
-func getMultipleUsers(tableName string, dynamoClient *dynamodb.DynamoDB) (*Response, error) {
+func getMultipleUsers(tableName string, dynamoClient *dynamodb.DynamoDB) (Response, error) {
 	users, err := user.FetchUsers(tableName, dynamoClient)
 	if err != nil {
-		return response(http.StatusBadRequest, ErrorBody{aws.String(err.Error())})
+		return JSONResponse(http.StatusBadRequest, ErrorBody{aws.String(err.Error())})
 	}
 
-	return response(http.StatusOK, users)
+	return JSONResponse(http.StatusOK, users)
 }
 
-func errorResponse(err error) (*Response, error) {
-	return response(http.StatusBadRequest, ErrorBody{aws.String(err.Error())})
+func errorResponse(err error) (Response, error) {
+	return JSONResponse(http.StatusBadRequest, ErrorBody{aws.String(err.Error())})
 }
