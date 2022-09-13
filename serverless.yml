@@ -43,6 +43,12 @@ functions:
       - http:
           path: users
           method: get
+  createUser:
+    handler: ./functions/createUser/createUser.go
+    events:
+      - http:
+          path: users
+          method: post
 
 resources:
   Resources:

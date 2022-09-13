@@ -15,7 +15,7 @@ func handler(ctx context.Context, req events.APIGatewayProxyRequest) (events.API
 		return handlers.JSONResponse(http.StatusInternalServerError, err.Error())
 	}
 
-	return handler.GetUser()
+	return handler.CreateUser()
 }
 
 func main() {
