@@ -61,7 +61,7 @@ func (h *Handler) DeleteUser() (Response, error) {
 		return errorResponse(err)
 	}
 
-	return JSONResponse(http.StatusCreated, nil)
+	return JSONResponse(http.StatusCreated, "user deleted")
 }
 
 func Prepare(req Request) (*Handler, error) {

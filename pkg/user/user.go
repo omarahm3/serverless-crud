@@ -30,6 +30,7 @@ var (
 	ErrorCouldNotUpdateUser    = fmt.Errorf("could not update user")
 	ErrorCouldNotDeleteUser    = fmt.Errorf("could not delete user")
 	ErrorEmailIsNotValid       = fmt.Errorf("email is not valid")
+	ErrorEmailIsNotProvided    = fmt.Errorf("email is not provided")
 )
 
 func FetchUser(email, tableName string, dynamoClient *dynamodb.DynamoDB) (*User, error) {
@@ -142,6 +143,10 @@ func UpdateUser(req Request, tableName string, dynamoClient *dynamodb.DynamoDB) 
 
 func DeleteUser(req Request, tableName string, dynamoClient *dynamodb.DynamoDB) error {
 	email := req.QueryStringParameters["email"]
+	if email == "" {
+		return ErrorEmailIsNotProvided
+	}
+
 	input := &dynamodb.DeleteItemInput{
 		Key: map[string]*dynamodb.AttributeValue{
 			"email": {

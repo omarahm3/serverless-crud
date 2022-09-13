@@ -49,6 +49,18 @@ functions:
       - http:
           path: users
           method: post
+  updateUser:
+    handler: ./functions/updateUser/updateUser.go
+    events:
+      - http:
+          path: users
+          method: put
+  deleteUser:
+    handler: ./functions/deleteUser/deleteUser.go
+    events:
+      - http:
+          path: users
+          method: delete
 
 resources:
   Resources:
