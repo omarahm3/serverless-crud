@@ -3,6 +3,7 @@ service: sls-users
 provider:
   name: aws
   runtime: go1.x
+  region: eu-central-1
   environment:
     TABLE_NAME: users-${opt:stage, sls:stage}
   iamRoleStatements:
