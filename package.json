@@ -1,7 +1,9 @@
 {
   "scripts": {
     "dev": "npx serverless offline start",
-    "watch": "nodemon --watch ./ -e go,js --exec make build-functions"
+    "watch": "nodemon --watch ./ -e go,js --exec make build-functions",
+    "deploy": "sls deploy -c serverless.prod.yml --verbose",
+    "destroy": "sls remove -c serverless.prod.yml --verbose"
   },
   "devDependencies": {
     "nodemon": "^2.0.19",
