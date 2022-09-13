@@ -105,14 +105,26 @@ func errorResponse(err error) (Response, error) {
 }
 
 func getDynamoClient() (*dynamodb.DynamoDB, error) {
+	var config *aws.Config
 	region := os.Getenv("AWS_REGION")
+	awsAccessKey := os.Getenv("AWS_ACCESS_KEY_ID")
+
+	// In case function is running locally
+	if awsAccessKey == "" {
+		config = &aws.Config{
+			Region:   aws.String(region),
+			Endpoint: aws.String("http://localhost:8001"),
+		}
+	}
+
 	awsSession, err := session.NewSession(&aws.Config{
 		Region: aws.String(region),
 	})
 	if err != nil {
 		return nil, err
 	}
-	return dynamodb.New(awsSession), nil
+
+	return dynamodb.New(awsSession, config), nil
 }
 
 func newHandler(req Request, tableName string, dynamoClient *dynamodb.DynamoDB) *Handler {
